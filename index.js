@@ -1,15 +1,15 @@
 import parseArgs from './parseArgs.js';
 import validate from './validate.js';
-import path from 'path';
-import { createReadStream, createWriteStream } from 'fs';
-import { createCipherStream } from './cipher.js';
+import { createInputStream } from './streams/input.js';
+import { createOutputStream } from './streams/output.js';
+import { createCipherStream } from './streams/cipher.js';
 import { pipeline } from 'stream';
 
 const args = parseArgs(process.argv.slice(2));
-let shift = parseInt(args.s || args.shift || '');
-let action = args.a || args.action;
-let input = args.i || args.input;
-let output = args.o || args.output;
+const shift = parseInt(args.s || args.shift || '');
+const action = args.a || args.action;
+const input = args.i || args.input;
+const output = args.o || args.output;
 
 const errors = [];
 
@@ -32,12 +32,9 @@ if (errors.length) {
 
 const shiftSign = action === 'encode' ? 1 : -1;
 
-const inputStream = input ? createReadStream(path.resolve(input)) : process.stdin;
-const outputStream = output ? createWriteStream(path.resolve(output)) : process.stdout;
-
 pipeline(
-  inputStream,
+  createInputStream(input),
   createCipherStream(shift * shiftSign),
-  outputStream,
+  createOutputStream(output),
   err => { if (err) console.error(err); }
 )

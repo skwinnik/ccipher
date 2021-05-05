@@ -1,5 +1,5 @@
 import { Transform } from 'stream';
-import shiftChar from './shiftChar.js';
+import shiftChar from '../shiftChar.js';
 
 export default class CipherStream extends Transform {
   constructor(shift) {
