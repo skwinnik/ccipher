@@ -1,27 +1,28 @@
 import { R_OK, W_OK } from 'constants';
 import { promises as fsPromises } from 'fs';
-import path from 'path';
+import actionEnum from './action.enum.js';
 
 export default {
-  async action(val) {
-    return val === 'encode' || val === 'decode';
+  action(val) {
+    return Object.keys(actionEnum).indexOf(val) > -1;
   },
-  async shift(val) {
+  shift(val) {
     return val && isFinite(val) && val !== 0;
   },
-  async input(val) {
+  async input(path) {
+    if (!path) return true;
     try {
-      await fsPromises.access(val, R_OK);
+      await fsPromises.access(path, R_OK);
       return true;
     }
     catch (e) {
       return false;
     }
   },
-  async output(val) {
+  async output(path) {
+    if (!path) return true;
     try {
-      await fsPromises.access(path.dirname(val), W_OK);
-      await fsPromises.writeFile(path.resolve(val), '');
+      await fsPromises.access(path, W_OK);
       return true;
     }
     catch (e) {
